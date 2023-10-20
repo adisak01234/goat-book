@@ -6,6 +6,7 @@ import time
 
 
 class NewVisitorTest(unittest.TestCase):
+    # TODO: clear data before running
     def setUp(self):
         self.browser = webdriver.Firefox()
 
