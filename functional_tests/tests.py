@@ -1,9 +1,13 @@
 from selenium import webdriver
+from selenium.common import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import unittest
 import time
 from django.test import LiveServerTestCase
+
+
+MAX_WAIT = 5
 
 
 class NewVisitorTest(LiveServerTestCase):
@@ -13,10 +17,18 @@ class NewVisitorTest(LiveServerTestCase):
     def tearDown(self):
         self.browser.quit()
 
-    def check_fow_row_in_list_table(self, row_text):
-        table = self.browser.find_element(By.ID, "id_list_table")
-        rows = table.find_elements(By.TAG_NAME, "tr")
-        self.assertIn(row_text, [row.text for row in rows])
+    def wait_for_row_in_list_table(self, row_text):
+        start_time = time.time()
+        while True:
+            try:
+                table = self.browser.find_element(By.ID, "id_list_table")
+                rows = table.find_elements(By.TAG_NAME, "tr")
+                self.assertIn(row_text, [row.text for row in rows])
+                return
+            except (AssertionError, WebDriverException):
+                if time.time() - start_time > MAX_WAIT:
+                    raise
+                time.sleep(0.1)
 
     def test_can_start_a_todo_list(self):
         # She checks out the homepage
@@ -37,18 +49,14 @@ class NewVisitorTest(LiveServerTestCase):
         # when she hit enter, the page updates, and now the page lists
         # "1: Buy peacock features" as an item in a to-do list
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
-
-        self.check_fow_row_in_list_table("1: Buy peacock features")
+        self.wait_for_row_in_list_table("1: Buy peacock features")
 
         # there is still a text box inviting her to add another item
         # she enters "Use peacock features to make a fly"
         inputbox = self.browser.find_element(By.ID, "id_new_item")
         inputbox.send_keys("Use peacock features to make a fly")
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
 
         # the page updates again, and now shows both items on her list
-        self.check_fow_row_in_list_table("1: Buy peacock features")
-        self.check_fow_row_in_list_table("2: Use peacock features to make a fly")
-
+        self.wait_for_row_in_list_table("1: Buy peacock features")
+        self.wait_for_row_in_list_table("2: Use peacock features to make a fly")
