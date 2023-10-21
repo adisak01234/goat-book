@@ -7,7 +7,7 @@ import time
 from django.test import LiveServerTestCase
 
 
-MAX_WAIT = 5
+MAX_WAIT = 1
 
 
 class NewVisitorTest(LiveServerTestCase):
@@ -60,3 +60,39 @@ class NewVisitorTest(LiveServerTestCase):
         # the page updates again, and now shows both items on her list
         self.wait_for_row_in_list_table("1: Buy peacock features")
         self.wait_for_row_in_list_table("2: Use peacock features to make a fly")
+
+    def test_multiple_users_can_start_lists_at_different_urls(self):
+        # user1 starts a new to-do list
+        self.browser.get(self.live_server_url)
+        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox.send_keys("Buy peacock features")
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table("1: Buy peacock features")
+
+        # she notices that her list has a unique URL
+        user1_list_url = self.browser.current_url
+        self.assertRegex(user1_list_url, "/lists/.*")
+
+        self.browser.delete_all_cookies()
+
+        # user2 visit the home page. There is no sign of user1's list
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element(By.TAG_NAME, "body").text
+        self.assertNotIn("Buy peacock features", page_text)
+        self.assertNotIn("make a fly", page_text)
+
+        # user2 starts a new list by entering a new item
+        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox.send_keys("Buy milk")
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table("1: Buy milk")
+
+        # user2 gets his own unique URL
+        user2_list_url = self.browser.current_url
+        self.assertRegex(user2_list_url, "/lists/.*")
+        self.assertNotEquals(user2_list_url, user1_list_url)
+
+        #  there is no trace of user1's list
+        page_text = self.browser.find_element(By.TAG_NAME, "body").text
+        self.assertNotIn("Buy peacock features", page_text)
+        self.assertNotIn("make a fly", page_text)
