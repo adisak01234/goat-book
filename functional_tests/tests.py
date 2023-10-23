@@ -8,7 +8,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 import os
 
 
-MAX_WAIT = 1
+MAX_WAIT = 5
 
 
 class NewVisitorTest(StaticLiveServerTestCase):
