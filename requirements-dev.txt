@@ -1,2 +1,2 @@
-django==4.2
+-r requirements.txt
 selenium
