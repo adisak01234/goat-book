@@ -12,7 +12,11 @@ eg, on Ubuntu:
 
     sudo add-apt-repository ppa:deadsnakes/ppa
     sudo apt update
-    sudo apt install nginx git python3.11 python3.11-venv python3.11-pip
+    sudo apt install nginx git python3.11 python3.11-venv
+
+    wget https://bootstrap.pypa.io/get-pip.py
+    sudo python3.11 get-pip.py
+
 
 ## Nginx Virtual Host config
 
