@@ -8,35 +8,6 @@ class HomePageTest(TestCase):
         self.assertTemplateUsed(response, "home.html")
 
 
-class ListAndItemModelTest(TestCase):
-    def test_saving_and_retrieving_items(self):
-        mylist = List()
-        mylist.save()
-
-        first_item = Item()
-        first_item.text = "The first (ever) list item"
-        first_item.list = mylist
-        first_item.save()
-
-        second_item = Item()
-        second_item.text = "Item the second"
-        second_item.list = mylist
-        second_item.save()
-
-        saved_list = List.objects.get()
-        self.assertEqual(saved_list, mylist)
-
-        saved_items = Item.objects.all()
-        self.assertEqual(saved_items.count(), 2)
-
-        first_saved_item = saved_items[0]
-        second_saved_item = saved_items[1]
-        self.assertEqual(first_saved_item.text, "The first (ever) list item")
-        self.assertEqual(first_saved_item.list, mylist)
-        self.assertEqual(second_saved_item.text, "Item the second")
-        self.assertEqual(second_saved_item.list, mylist)
-
-
 class ListViewTest(TestCase):
     def test_uses_list_template(self):
         mylist = List.objects.create()
@@ -86,7 +57,6 @@ class NewItemTest(TestCase):
             data={"item_text": "A new item for an existing list"},
         )
 
-        # TODO: code: add url for adding item to existing list
         self.assertEqual(Item.objects.count(), 1)
         new_item = Item.objects.get()
         self.assertEqual(new_item.text, "A new item for an existing list")
