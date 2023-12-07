@@ -56,5 +56,6 @@ def _update_static_files(c):
 
 
 def _update_database(c):
+    c.run('rm db.sqlite3')
     c.run('./.venv/bin/python manage.py makemigrations --noinput')
     c.run('./.venv/bin/python manage.py migrate --noinput')
